@@ -1,0 +1,11 @@
+name: ds
+channels:
+  - anaconda
+  - conda-forge
+  - defaults
+dependencies:
+  - python=3.9
+  - flask
+  - scikit-learn=0.24
+  - gunicorn
+  - numpy
