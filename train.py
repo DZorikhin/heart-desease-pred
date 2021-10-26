@@ -9,7 +9,7 @@ from sklearn.metrics import roc_auc_score
 
 # parameters
 
-C = 1.0
+C = 0.1
 output_file = f'model_C={C}.bin'
 
 
@@ -40,7 +40,7 @@ df_test = df_test[selected_f].reset_index(drop=True)
 
 # train the final model
 
-lr = LogisticRegression(C=0.1,
+lr = LogisticRegression(C=C,
                         class_weight={0:1, 1:4}, 
                         max_iter=10000, 
                         random_state=13)
