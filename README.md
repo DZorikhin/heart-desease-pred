@@ -36,11 +36,12 @@ Predict variable (desired target):
 
 ## Solution
 This is a binary classification problem. It has been decided to use following models for the development of ML solution:
-1. [Logistic regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
-2. [Decision tree classifier](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
+1. [Logistic Regression](https://scikit-learn.org/stable/modules/generated/sklearn.linear_model.LogisticRegression.html)
+2. [Decision Tree Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.tree.DecisionTreeClassifier.html)
 3. [Random Forest Classifier](https://scikit-learn.org/stable/modules/generated/sklearn.ensemble.RandomForestClassifier.html)
 4. [XGBoost](https://xgboost.readthedocs.io/en/latest/)
 5. [LightGBM](https://lightgbm.readthedocs.io/en/latest/)
+6. [k-Nearest Neighbors](https://scikit-learn.org/stable/modules/generated/sklearn.neighbors.KNeighborsClassifier.html)
 
 Evaluation metric [ROC-AUC](https://scikit-learn.org/stable/modules/generated/sklearn.metrics.roc_auc_score.html) has been chosen for the model selection process.
 
@@ -77,3 +78,9 @@ Installation of dependencies and activating a conda environment in a Dockerfile 
 Build the container: `sudo docker build -t heart-disease .`
 
 Run the container: `docker run -it --rm -p 9696:9696 heart-disease`
+
+Test prediction made by the model by running: `python predict-test.py`. Based on the health parameters provided in the `predict-test.py` file you should get following result:
+```
+{'disease_probability': 0.22, 'risk': False}
+The person with provided health parameters has NO 10-year risk of future coronary heart disease
+```
