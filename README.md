@@ -73,14 +73,53 @@ The majority of depencencies have been removed except required for production de
   
 Please refer to `environment.yml` file for details.
 
-Installation of dependencies and activating a conda environment in a Dockerfile is not a straightforward process and significantly differs from using other virtual environment handling tools. I used [this](https://pythonspeed.com/articles/activate-conda-dockerfile/) article as a guidance when I create the `Dockerfile`. I would like to pay your attention to additional file `entrypoint.sh` which is used to disable so-called “bash strict mode” when activating conda environment. This is done because some Conda activation scripts break when this mode is enabled.
+Installation of dependencies and activating a conda environment in a Dockerfile is not a straightforward process and significantly differs from using other virtual environment handling tools. I used [this](https://pythonspeed.com/articles/activate-conda-dockerfile/) article as a guidance when I create the `Dockerfile`. I would like to pay your attention to additional file `entrypoint.sh` which is used to disable so-called “bash strict mode” when activating conda environment. This is done because some Conda activation scripts break when this mode is enabled. Before proceeding with the building of container please make sure that the line `CMD ["./entrypoint.sh"]` in `Dockerfile` **is commented** and line `exec gunicorn --bind 0.0.0.0:<dollar_sign>PORT predict:app` in `entrypoint.sh` **is commented**.
 
 Build the container: `sudo docker build -t heart-disease .`
 
 Run the container: `docker run -it --rm -p 9696:9696 heart-disease`
 
-Test prediction made by the model by running: `python predict-test.py`. Based on the health parameters provided in the `predict-test.py` file you should get following result:
+Test prediction made by the model by running: `python predict-test.py`. Based on the health parameters provided in the `predict-test.py` file you should get the following result:
 ```
 {'disease_probability': 0.22, 'risk': False}
 The person with provided health parameters has NO 10-year risk of future coronary heart disease
 ```
+
+## Deployment to the Cloud: Heroku
+*It is assumed that you already have Heroku account*
+
+Due to the nature of how Heroku creates applications and specific requirements to the Dockerfile command please make sure that you've done the following in the `Dockerfile`:
+- comment line `EXPOSE 9696` - [EXPOSE is NOT supported by Heroku](https://devcenter.heroku.com/articles/container-registry-and-runtime#:~:text=EXPOSE%20%2D%20While%20EXPOSE%20can%20be,get%20the%20%24PORT%20environment%20variable.)
+- comment line `ENTRYPOINT ["./entrypoint.sh"]`
+- uncomment line `CMD ["./entrypoint.sh"]` - CMD is required to run on Heroku 
+
+Please make sure that you've done the following in the `entrypoint.sh` as well:
+- comment line `exec gunicorn --bind=0.0.0.0:9696 predict:app`
+- uncomment line `exec gunicorn --bind 0.0.0.0:<dollar_sign>PORT predict:app` - PORT is set by Heroku
+
+Make sure that you’re logged in to Heroku (`heroku login`) and then login to the Container Registry by running `heroku container:login`. Run the following commands:
+- `heroku apps:create heart-disease-pred-z` - create app with name heart-disease-pred-z (choose any)
+- `heroku git:remote -a heart-disease-pred-z` - (optional) in case the app not found
+- `heroku container:push web` - build the image and push to Container Registry
+- `heroku container:release web` - release the image to your app
+- `heroku open` - (optional) open app in the browser
+
+Public endpoint to test: `https://heart-disease-pred-z.herokuapp.com/predict`. Please run the command `python predict-test-cloud.py` to test the model prediction. Based on health data provided in that file you should get the following result:
+```
+{'disease_probability': 0.8, 'risk': True}
+The person with provided health parameters has 10-year risk of future coronary heart disease
+```
+
+**Be aware that it might take some time (couple of minutes) for the app to respond because it might require to launch the app on Heroku platform.**
+
+## Deployment to the Cloud: AWS Elastic Beanstalk (Attempt)
+*It is assumed that you already have AWS account and assinged IAM user. `Dockerfile` and `entrypoint.sh` files are used as in Containerization section*
+
+It is required to install `awsebcli` in the current active environment to deploy the model to the AWS cloud. It could be done with the following command: `conda install -c conda-forge awsebcli`. 
+
+Create an application: `eb init -p docker -r eu-west-1 heart-disease-pred`.
+
+Test EB locally: `eb local run --port 9696` and `python predict-test.py`.
+
+Create an environment in the cloud: `eb create heart-disease-pred-env`. During execution of this command I experienced the issue of creating image from my Dockerfile which could be associated with the way how conda activates environment inside docker container and how this process interacts with Elastic Beanstalk internal processes. The decision I made is to make it as an deployment attempt and proceed with deployment on Heroku (explained above).
+
