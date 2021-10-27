@@ -1,18 +1,19 @@
 import requests
 
-url = f'http://localhost:9696/predict'
+host = 'https://heart-disease-pred-z.herokuapp.com/'
+url = f'{host}/predict'
 
 parameters = {
-    "age": 25,
+    "age": 45,
     "cigsPerDay": 20,
     "totChol": 250,
-    "sysBP": 150,
+    "sysBP": 250,
     "BMI": 25,
     "heartRate": 65,
     "glucose": 100,
     "male": 1,
     "currentSmoker": 1,
-    "BPMeds": 0,
+    "BPMeds": 1,
     "prevalentStroke": 0,
     "prevalentHyp": 1,
     "diabetes": 0
