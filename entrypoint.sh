@@ -13,5 +13,5 @@ conda activate ds
 set -euo pipefail
 
 # exec the final command:
-# exec gunicorn --bind=0.0.0.0:9696 predict:app
-exec gunicorn --bind 0.0.0.0:$PORT predict:app
+exec gunicorn --bind=0.0.0.0:9696 predict:app
+# exec gunicorn --bind 0.0.0.0:$PORT predict:app

@@ -13,8 +13,8 @@ SHELL ["/bin/bash", "--login", "-c"]
 # The code to run when container is started:
 COPY predict.py model_C=0.1.bin entrypoint.sh ./
 
-# EXPOSE 9696
+EXPOSE 9696
 
 RUN chmod +x entrypoint.sh
-# ENTRYPOINT ["./entrypoint.sh"]
-CMD ["./entrypoint.sh"]
+ENTRYPOINT ["./entrypoint.sh"]
+# CMD ["./entrypoint.sh"]
